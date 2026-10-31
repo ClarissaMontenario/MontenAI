@@ -1,0 +1,35 @@
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Banco de dados
+*.db
+*.sqlite
+*.sqlite3
+
+# Arquivos enviados pelos usuários
+backend/data/uploads/
+backend/data/guest_uploads/
+
+# Banco vetorial local
+backend/chroma_db/
+
+# Logs
+*.log
+
+# Node.js
+frontend/node_modules/
+frontend/dist/
+
+# Sistema operacional e editor
+.DS_Store
+Thumbs.db
+.vscode/

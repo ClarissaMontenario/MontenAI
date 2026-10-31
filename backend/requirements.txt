@@ -1,0 +1,24 @@
+fastapi
+uvicorn[standard]
+python-multipart
+streamlit
+groq
+pypdf
+pymupdf
+Pillow
+chromadb
+python-dotenv
+pandas
+fastembed
+plotly
+# Banco de dados e usuários
+sqlalchemy>=2.0
+psycopg[binary]
+
+# Autenticação e segurança
+pwdlib[argon2]
+PyJWT
+email-validator
+
+# Limitação de requisições
+slowapi
