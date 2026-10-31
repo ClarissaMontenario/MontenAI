@@ -89,7 +89,8 @@ Standalone search query:
 """
             }
         ],
-        temperature=0.0
+        temperature=0.0,
+        max_tokens=500
     )
 
     rewritten = response.choices[0].message.content.strip()
@@ -201,7 +202,8 @@ Answer using the retrieved context.
     response = client.chat.completions.create(
         model=MODEL_NAME,
         messages=messages,
-        temperature=0.2
+        temperature=0.2,
+        max_tokens=500
     )
 
     answer = response.choices[0].message.content
