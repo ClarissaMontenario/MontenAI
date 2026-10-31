@@ -11,6 +11,7 @@ python-dotenv
 pandas
 fastembed
 plotly
+google-genai
 # Banco de dados e usuários
 sqlalchemy>=2.0
 psycopg[binary]
@@ -22,3 +23,4 @@ email-validator
 
 # Limitação de requisições
 slowapi
+

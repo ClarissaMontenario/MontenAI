@@ -13,21 +13,34 @@ DB_PATH = PROJECT_ROOT / "chroma_db"
 
 client = chromadb.PersistentClient(path=str(DB_PATH))
 
+# Nova coleção para os embeddings do Gemini.
+# A coleção antiga será preservada.
 collection = client.get_or_create_collection(
-    name="documents",
+    name="documents_gemini",
     metadata={"hnsw:space": "cosine"}
 )
 
 
-def add_documents(chunks, document_id, document_name, owner_id):
+def add_documents(
+    chunks,
+    document_id,
+    document_name,
+    owner_id
+):
     """Adiciona trechos identificados pelo proprietário."""
 
     if not chunks:
         return 0
 
     texts = [chunk["text"] for chunk in chunks]
+
+    # Gera embeddings pela API Gemini.
     embeddings = generate_embeddings(texts)
-    ids = [str(uuid.uuid4()) for _ in chunks]
+
+    ids = [
+        str(uuid.uuid4())
+        for _ in chunks
+    ]
 
     metadatas = [
         {
@@ -49,14 +62,21 @@ def add_documents(chunks, document_id, document_name, owner_id):
     return len(chunks)
 
 
-def search_documents(question, top_k=5, document_ids=None, owner_id=None):
-    """Busca trechos somente nos documentos do proprietário informado."""
+def search_documents(
+    question,
+    top_k=5,
+    document_ids=None,
+    owner_id=None
+):
+    """Busca trechos somente nos documentos do proprietário."""
 
     if not question or not question.strip():
         raise ValueError("A pergunta não pode estar vazia.")
 
     if not owner_id:
-        raise ValueError("Identificação do proprietário obrigatória.")
+        raise ValueError(
+            "Identificação do proprietário obrigatória."
+        )
 
     query_embedding = generate_query_embedding(question)
 
@@ -70,7 +90,8 @@ def search_documents(question, top_k=5, document_ids=None, owner_id=None):
         })
 
     where_filter = (
-        filters[0] if len(filters) == 1
+        filters[0]
+        if len(filters) == 1
         else {"$and": filters}
     )
 
@@ -82,10 +103,14 @@ def search_documents(question, top_k=5, document_ids=None, owner_id=None):
 
     retrieved_chunks = []
 
-    if not results["documents"] or not results["documents"][0]:
+    if (
+        not results["documents"]
+        or not results["documents"][0]
+    ):
         return retrieved_chunks
 
     for i, text in enumerate(results["documents"][0]):
+
         metadata = results["metadatas"][0][i]
 
         retrieved_chunks.append({
@@ -100,8 +125,12 @@ def search_documents(question, top_k=5, document_ids=None, owner_id=None):
 
 
 def delete_document(document_id, owner_id):
+    """Exclui somente os trechos do documento do proprietário."""
+
     if not owner_id:
-        raise ValueError("Identificação do proprietário obrigatória.")
+        raise ValueError(
+            "Identificação do proprietário obrigatória."
+        )
 
     where_filter = {
         "$and": [
@@ -124,9 +153,14 @@ def delete_document(document_id, owner_id):
 
     return len(ids)
 
+
 def list_documents(owner_id):
+    """Lista documentos pertencentes ao usuário."""
+
     if not owner_id:
-        raise ValueError("Identificação do proprietário obrigatória.")
+        raise ValueError(
+            "Identificação do proprietário obrigatória."
+        )
 
     results = collection.get(
         where={"owner_id": owner_id},
@@ -136,6 +170,7 @@ def list_documents(owner_id):
     documents = {}
 
     for metadata in results["metadatas"]:
+
         document_id = metadata["document_id"]
 
         if document_id not in documents:
@@ -149,6 +184,7 @@ def list_documents(owner_id):
         documents[document_id]["chunks"] += 1
 
     return list(documents.values())
+
 
 def get_collection_count(owner_id=None):
     """Retorna a quantidade de trechos."""
